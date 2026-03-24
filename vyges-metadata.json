@@ -18,7 +18,7 @@
       "rtl/uart_tx.sv"
     ]
   },
-  "updated": "2026-02-19T06:22:56Z",
+  "updated": "2026-03-24T02:12:57Z",
   "$schema": "https://vyges.com/schema/v1/vyges-metadata.schema.json",
   "x-version": "1.0.0",
   "description": "Uart. OpenTitan IP block from hw/ip/uart.",
@@ -30,7 +30,7 @@
   "design_type": [
     "digital"
   ],
-  "maturity": "imported",
+  "maturity": "prototype",
   "created": "2026-02-19T06:12:02Z",
   "interfaces": [
     {
@@ -38,13 +38,123 @@
       "direction": "input",
       "protocol": "TL-UL",
       "width": 32,
-      "description": "TL-UL host interface for register access"
+      "description": "TL-UL host interface for register access",
+      "signals": [
+        {
+          "name": "clk_i",
+          "direction": "input",
+          "type": "clock",
+          "width": 1,
+          "description": "System clock"
+        },
+        {
+          "name": "rst_ni",
+          "direction": "input",
+          "type": "reset",
+          "width": 1,
+          "active_level": "low",
+          "description": "Active-low synchronous reset"
+        },
+        {
+          "name": "tl_i",
+          "direction": "input",
+          "type": "data",
+          "width": 1,
+          "description": "TL-UL host-to-device (tl_h2d_t struct) \u2014 connect to xbar slave port"
+        },
+        {
+          "name": "tl_o",
+          "direction": "output",
+          "type": "data",
+          "width": 1,
+          "description": "TL-UL device-to-host (tl_d2h_t struct) \u2014 connect to xbar slave port"
+        }
+      ]
     },
     {
       "type": "bus",
       "direction": "output",
       "protocol": "UART",
-      "description": "UART TX/RX serial interface"
+      "description": "UART TX/RX serial interface",
+      "signals": [
+        {
+          "name": "cio_rx_i",
+          "direction": "input",
+          "type": "data",
+          "width": 1,
+          "description": "UART receive pin"
+        },
+        {
+          "name": "cio_tx_o",
+          "direction": "output",
+          "type": "data",
+          "width": 1,
+          "description": "UART transmit pin"
+        },
+        {
+          "name": "cio_tx_en_o",
+          "direction": "output",
+          "type": "control",
+          "width": 1,
+          "description": "TX output enable"
+        },
+        {
+          "name": "intr_tx_watermark_o",
+          "direction": "output",
+          "type": "interrupt",
+          "width": 1,
+          "description": "TX FIFO watermark interrupt"
+        },
+        {
+          "name": "intr_rx_watermark_o",
+          "direction": "output",
+          "type": "interrupt",
+          "width": 1,
+          "description": "RX FIFO watermark interrupt"
+        },
+        {
+          "name": "intr_tx_done_o",
+          "direction": "output",
+          "type": "interrupt",
+          "width": 1,
+          "description": "TX complete interrupt"
+        },
+        {
+          "name": "intr_rx_overflow_o",
+          "direction": "output",
+          "type": "interrupt",
+          "width": 1,
+          "description": "RX overflow interrupt"
+        },
+        {
+          "name": "intr_rx_frame_err_o",
+          "direction": "output",
+          "type": "interrupt",
+          "width": 1,
+          "description": "RX frame error interrupt"
+        },
+        {
+          "name": "intr_rx_break_err_o",
+          "direction": "output",
+          "type": "interrupt",
+          "width": 1,
+          "description": "RX break error interrupt"
+        },
+        {
+          "name": "intr_rx_timeout_o",
+          "direction": "output",
+          "type": "interrupt",
+          "width": 1,
+          "description": "RX timeout interrupt"
+        },
+        {
+          "name": "intr_rx_parity_err_o",
+          "direction": "output",
+          "type": "interrupt",
+          "width": 1,
+          "description": "RX parity error interrupt"
+        }
+      ]
     }
   ],
   "categories": [

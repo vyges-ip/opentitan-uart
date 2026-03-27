@@ -3,231 +3,53 @@
   "x-version": "1.0.0",
   "name": "opentitan-uart",
   "version": "0.1.0",
-  "description": "Full-featured UART controller with configurable TX/RX FIFOs, NCO-based baud rate generator, parity support, break detection, loopback modes, and 9 interrupt sources. TileLink-UL slave interface with register-based configuration. Extracted from OpenTitan (lowRISC).",
+  "description": "IP imported from https://github.com/lowRISC/opentitan",
   "license": "Apache-2.0",
-  "maturity": "production",
-  "target": ["asic", "fpga"],
-  "design_type": ["digital"],
-  "created": "2026-02-19T06:12:02Z",
-  "updated": "2026-03-27T19:17:32Z",
+  "maturity": "draft",
+  "target": [
+    "asic",
+    "fpga"
+  ],
+  "design_type": [
+    "digital"
+  ],
+  "created": "2026-03-27T23:06:06Z",
+  "updated": "2026-03-27T23:06:06Z",
   "source": {
     "type": "git",
     "url": "https://github.com/lowRISC/opentitan",
-    "commit": "304378684dfcf5be73bbd14faffa71790793d8c6",
-    "ip_path": "hw/ip/uart",
+    "commit": "7fbd85829ec6354ef6497df69536cefe862c1f5a",
     "private": false,
-    "rtl_path": "rtl",
-    "rtl_files": [
-      "rtl/uart.sv",
-      "rtl/uart_core.sv",
-      "rtl/uart_reg_pkg.sv",
-      "rtl/uart_reg_top.sv",
-      "rtl/uart_rx.sv",
-      "rtl/uart_tx.sv"
-    ]
+    "indexing": true
   },
   "maintainers": [
     {
       "name": "Vyges",
       "email": "team@vyges.com",
-      "url": "https://vyges.com",
       "github": "vyges"
     }
   ],
-  "interfaces": [
-    {
-      "type": "bus",
-      "direction": "slave",
-      "protocol": "TL-UL",
-      "port": "tl",
-      "width": 32,
-      "description": "TileLink-UL slave interface for register access. 13 registers, 6-bit address width.",
-      "signals": [
-        {"name": "clk_i", "direction": "input", "type": "clock", "width": 1, "description": "System clock"},
-        {"name": "rst_ni", "direction": "input", "type": "reset", "width": 1, "active_level": "low", "description": "Active-low synchronous reset"},
-        {"name": "tl_i", "direction": "input", "type": "data", "width": 1, "description": "TL-UL host-to-device struct (tl_h2d_t)"},
-        {"name": "tl_o", "direction": "output", "type": "data", "width": 1, "description": "TL-UL device-to-host struct (tl_d2h_t)"}
-      ]
-    },
-    {
-      "type": "serial",
-      "direction": "bidirectional",
-      "protocol": "UART",
-      "port": "cio",
-      "description": "UART serial TX/RX pins. TX always enabled (cio_tx_en_o = 1).",
-      "signals": [
-        {"name": "cio_rx_i", "direction": "input", "type": "data", "width": 1, "description": "UART receive"},
-        {"name": "cio_tx_o", "direction": "output", "type": "data", "width": 1, "description": "UART transmit"},
-        {"name": "cio_tx_en_o", "direction": "output", "type": "control", "width": 1, "description": "TX output enable (always 1)"}
-      ]
-    },
-    {
-      "type": "interrupt",
-      "direction": "output",
-      "protocol": "level",
-      "port": "intr",
-      "width": 9,
-      "description": "9 interrupt outputs: tx_watermark, tx_empty, rx_watermark, tx_done, rx_overflow, rx_frame_err, rx_break_err, rx_timeout, rx_parity_err",
-      "signals": [
-        {"name": "intr_tx_watermark_o", "direction": "output", "type": "interrupt", "width": 1, "description": "TX FIFO below watermark"},
-        {"name": "intr_tx_empty_o", "direction": "output", "type": "interrupt", "width": 1, "description": "TX FIFO empty"},
-        {"name": "intr_rx_watermark_o", "direction": "output", "type": "interrupt", "width": 1, "description": "RX FIFO above watermark"},
-        {"name": "intr_tx_done_o", "direction": "output", "type": "interrupt", "width": 1, "description": "TX byte complete"},
-        {"name": "intr_rx_overflow_o", "direction": "output", "type": "interrupt", "width": 1, "description": "RX FIFO overflow"},
-        {"name": "intr_rx_frame_err_o", "direction": "output", "type": "interrupt", "width": 1, "description": "RX framing error"},
-        {"name": "intr_rx_break_err_o", "direction": "output", "type": "interrupt", "width": 1, "description": "RX break condition"},
-        {"name": "intr_rx_timeout_o", "direction": "output", "type": "interrupt", "width": 1, "description": "RX idle timeout"},
-        {"name": "intr_rx_parity_err_o", "direction": "output", "type": "interrupt", "width": 1, "description": "RX parity error"}
-      ]
-    },
-    {
-      "type": "alert",
-      "direction": "bidirectional",
-      "protocol": "OpenTitan alert",
-      "port": "alert",
-      "description": "1 fatal alert (bus integrity error). Uses prim_alert_sender.",
-      "signals": [
-        {"name": "alert_rx_i", "direction": "input", "type": "alert", "width": 1},
-        {"name": "alert_tx_o", "direction": "output", "type": "alert", "width": 1}
-      ]
-    }
-  ],
-  "parameters": [
-    {
-      "name": "RxFifoDepth",
-      "type": "int",
-      "default": 64,
-      "description": "RX FIFO depth in bytes. Must be < 256. Defined in uart_reg_pkg."
-    },
-    {
-      "name": "TxFifoDepth",
-      "type": "int",
-      "default": 32,
-      "description": "TX FIFO depth in bytes. Must be < 256. Defined in uart_reg_pkg."
-    },
-    {
-      "name": "NumAlerts",
-      "type": "int",
-      "default": 1,
-      "description": "Number of alert channels (fixed at 1 — fatal bus integrity)."
-    },
-    {
-      "name": "EnableRacl",
-      "type": "bit",
-      "default": "1'b0",
-      "description": "Enable RACL (Register Access Control Lists). When 0, RACL logic is inactive."
-    },
-    {
-      "name": "AlertAsyncOn",
-      "type": "logic",
-      "default": "1'b1",
-      "description": "Enable asynchronous alert signaling per alert channel."
-    }
-  ],
-  "performance": {
-    "frequency": {
-      "asic_sky130": "50 MHz (proven in edge-sensor-soc OpenLane hardening)",
-      "fpga_artix7": "50 MHz (proven in Arty A7-100T Vivado build)",
-      "fpga_ultrascale": "100+ MHz (estimated)"
-    },
-    "baud_rate": "Configurable via 16-bit NCO. At 50 MHz: up to 3.125 Mbaud. Typical: 115200, 9600.",
-    "fifo": "TX 32-byte, RX 64-byte. Configurable watermark levels.",
-    "latency": "1 clock cycle register access (TL-UL). Baud rate sets serial latency.",
-    "gate_count": "~4,759 cells (sky130_fd_sc_hd, Yosys synthesis)"
-  },
+  "interfaces": [],
+  "parameters": [],
   "architecture": {
     "type": "peripheral",
-    "submodules": ["uart_core", "uart_reg_top", "uart_rx", "uart_tx", "uart_reg_pkg"],
-    "features": [
-      "NCO-based fractional baud rate generator (16-bit, any baud from system clock)",
-      "TX FIFO (32 bytes) + RX FIFO (64 bytes) with configurable watermark interrupts",
-      "9 interrupt sources (watermark, empty, done, overflow, frame/break/parity/timeout errors)",
-      "System loopback and line loopback modes for testing",
-      "RX noise filter (configurable)",
-      "RX parity checking (even/odd, configurable)",
-      "RX break detection with configurable threshold",
-      "RX idle timeout with 24-bit counter",
-      "Bus integrity checking (SECDED) with fatal alert on error",
-      "RACL support (register access control, optional)",
-      "Auto-generated register file (reggen) with 13 CSRs"
-    ],
-    "register_map": {
-      "num_registers": 13,
-      "address_width": 6,
-      "key_registers": [
-        "CTRL (0x10): TX/RX enable, NCO baud divisor, loopback, parity",
-        "STATUS (0x14): TX/RX FIFO full/empty, TX idle",
-        "RDATA (0x18): RX data read",
-        "WDATA (0x1C): TX data write",
-        "FIFO_CTRL (0x20): FIFO reset, watermark levels",
-        "FIFO_STATUS (0x24): TX/RX FIFO depth"
-      ]
+    "features": []
+  },
+  "categories": [
+    {
+      "main_category": "Miscellaneous",
+      "sub_category": "Custom Accelerators"
     }
-  },
-  "dependencies": [
-    {"name": "opentitan-prim", "type": "library", "description": "prim_alert_sender, prim_fifo_sync, prim_intr_hw, prim_subreg"},
-    {"name": "opentitan-tlul", "type": "bus", "description": "tlul_pkg (tl_h2d_t, tl_d2h_t types)"}
   ],
-  "test": {
-    "testbenches": ["systemverilog", "verilator"],
-    "status": "passing",
-    "simulators": ["verilator"],
-    "coverage": "functional",
-    "notes": "RTL integration verified in edge-sensor-soc (Verilator sim + Vivado FPGA). OpenTitan upstream has full DV (UVM) test suite."
-  },
-  "documentation": {
-    "upstream": "https://opentitan.org/book/hw/ip/uart/",
-    "register_map": "Auto-generated from uart.hjson via reggen"
-  },
-  "artifacts": {
-    "rtl": [
-      "rtl/uart.sv",
-      "rtl/uart_core.sv",
-      "rtl/uart_reg_pkg.sv",
-      "rtl/uart_reg_top.sv",
-      "rtl/uart_rx.sv",
-      "rtl/uart_tx.sv"
-    ],
-    "total_rtl_lines": 3190
-  },
-  "categories": {
-    "primary": "peripheral",
-    "secondary": ["communication", "serial"],
-    "tags": ["uart", "serial", "tl-ul", "fifo", "interrupt", "opentitan", "lowrisc", "baud-rate", "nco"]
-  },
   "trust": {
-    "verification_level": "silicon_proven",
-    "tapeout_count": 3,
-    "fpga_validated": true,
-    "formal_verified": false,
-    "maintained": true,
-    "last_activity": "2026-03-27",
-    "notes": "Silicon-proven in OpenTitan Earl Grey (3 tapeouts). FPGA-validated in edge-sensor-soc on Arty A7-100T. Yosys synthesis: 4,759 cells (sky130)."
+    "verification_level": "unknown",
+    "maintained": true
   },
-  "asic": {
-    "flavor": "digital",
-    "technology": ["sky130A"],
-    "estimated_area": "48,628 um2 (sky130_fd_sc_hd)",
-    "estimated_gate_count": "~12,967 GE"
-  },
-  "fpga": {
-    "toolchain": ["Vivado", "Yosys"],
-    "devices": ["Artix-7 (xc7a100t)"],
-    "resource_estimate": "~537 LUTs, ~1039 FFs (post-route, Vivado 2025.2)"
-  },
-  "community": {
-    "issues": "https://github.com/vyges-ip/opentitan-uart/issues",
-    "contributions": "https://github.com/vyges-ip/opentitan-uart/pulls"
-  },
-  "keywords": [
-    "uart", "serial", "opentitan", "lowrisc", "tl-ul", "tilelink",
-    "fifo", "baud-rate", "nco", "interrupt", "parity", "loopback"
-  ],
+  "_note": "AI enrichment failed. Manual population needed.",
   "meta": {
     "template": {
-      "generator": "manual (gold-standard pass 2026-03-27)",
-      "template_version": "1.0.0",
-      "generated_at": "2026-03-27T19:17:32Z"
+      "generator": "upstream-sync-fallback",
+      "generated_at": "2026-03-27T23:06:06Z"
     },
     "schema": {
       "version": "1.0.0"

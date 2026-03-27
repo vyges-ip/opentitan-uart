@@ -1,41 +1,29 @@
-# UART HWIP Technical Specification
+# OpenTitan
 
-[`uart`](https://reports.opentitan.org/hw/ip/uart/dv/latest/report.html):
-![](https://dashboards.lowrisc.org/badges/dv/uart/test.svg)
-![](https://dashboards.lowrisc.org/badges/dv/uart/passing.svg)
-![](https://dashboards.lowrisc.org/badges/dv/uart/functional.svg)
-![](https://dashboards.lowrisc.org/badges/dv/uart/code.svg)
+![OpenTitan logo](./doc/opentitan-logo.png)
 
-# Overview
+## About the project
 
-This document specifies UART hardware IP functionality. This module
-conforms to the
-[Comportable guideline for peripheral functionality.](../../../doc/contributing/hw/comportability/README.md)
-See that document for integration overview within the broader
-top level system.
+[OpenTitan](https://opentitan.org) is an open source silicon Root of Trust (RoT) project.
+OpenTitan will make the silicon RoT design and implementation more transparent, trustworthy, and secure for enterprises, platform providers, and chip manufacturers.
+OpenTitan is administered by [lowRISC CIC](https://www.lowrisc.org) as a collaborative project to produce high quality, open IP for instantiation as a full-featured product.
+See the [OpenTitan site](https://opentitan.org) and [OpenTitan docs](https://opentitan.org/book/) for more information about the project.
 
+## About this repository
 
-## Features
+This repository contains hardware, software and utilities written as part of the OpenTitan project.
+It is structured as monolithic repository, or "monorepo", where all components live in one repository.
+It exists to enable collaboration across partners participating in the OpenTitan project.
 
-- 2-pin full duplex external interface
-- 8-bit data word, optional even or odd parity bit per byte
-- 1 stop bit
-- 64 x 8b RX buffer
-- 32 x 8b TX buffer
-- Programmable baud rate
-- Interrupt for transmit empty, receive overflow, frame error, parity error, break error, receive
-  timeout
+## Documentation
 
-## Description
+The project contains comprehensive documentation of all IPs and tools.
+You can access it [online at opentitan.org/book/](https://opentitan.org/book/).
 
-The UART module is a serial-to-parallel receive (RX) and parallel-to-serial
-(TX) full duplex design intended to communicate to an outside device, typically
-for basic terminal-style communication. It is programmed to run at a particular
-baud rate and contains only a transmit and receive signal to the outside world,
-i.e. no synchronizing clock. The programmable baud rate guarantees to be met up
-to 1Mbps.
+## How to contribute
 
-## Compatibility
+Have a look at [CONTRIBUTING](CONTRIBUTING.md) and our [documentation on project organization and processes](./doc/project_governance/README.md) for guidelines on how to contribute code to this repository.
 
-The OpenTitan UART is feature compatible to a specific implementation in [Chromium EC](https://chromium.googlesource.com/chromiumos/platform/ec/+/refs/heads/cr50_stab/chip/g/uart.c).
-Additional features such as parity have been added.
+## Licensing
+
+Unless otherwise noted, everything in this repository is covered by the Apache License, Version 2.0 (see [LICENSE](https://github.com/lowRISC/opentitan/blob/master/LICENSE) for full text).

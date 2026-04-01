@@ -1,85 +1,208 @@
 {
-  "name": "opentitan-uart",
-  "version": "0.1.0",
-  "license": "Apache-2.0",
-  "source": {
-    "type": "git",
-    "url": "https://github.com/lowRISC/opentitan",
-    "commit": "304378684dfcf5be73bbd14faffa71790793d8c6",
-    "ip_path": "hw/ip/uart",
-    "private": false,
-    "rtl_path": "rtl",
-    "rtl_files": [
-      "rtl/uart.sv",
-      "rtl/uart_core.sv",
-      "rtl/uart_reg_pkg.sv",
-      "rtl/uart_reg_top.sv",
-      "rtl/uart_rx.sv",
-      "rtl/uart_tx.sv"
-    ]
-  },
-  "updated": "2026-02-19T06:22:56Z",
   "$schema": "https://vyges.com/schema/v1/vyges-metadata.schema.json",
   "x-version": "1.0.0",
-  "description": "Uart. OpenTitan IP block from hw/ip/uart.",
-  "template": "opentitan-ip-template@1.0.0",
+  "name": "opentitan-uart",
+  "version": "0.1.0",
+  "description": "A UART (Universal Asynchronous Receiver-Transmitter) IP core from the OpenTitan project, supporting TL-UL protocol for communication and featuring configurable FIFO depths, interrupt handling, and error detection mechanisms.",
+  "license": "Apache-2.0",
+  "maturity": "production",
   "target": [
-    "fpga",
-    "asic"
+    "asic",
+    "fpga"
   ],
   "design_type": [
     "digital"
   ],
-  "maturity": "imported",
-  "created": "2026-02-19T06:12:02Z",
+  "created": "2026-04-01T06:04:51Z",
+  "updated": "2026-04-01T06:04:51Z",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/lowRISC/opentitan",
+    "commit": "4be12ad66f947eb28efb785cf644643bf75517af",
+    "ip_path": "hw/ip/uart",
+    "private": false,
+    "containsEncryptedPayload": false,
+    "indexing": true
+  },
+  "maintainers": [
+    {
+      "name": "Vyges",
+      "email": "team@vyges.com",
+      "url": "https://vyges.com",
+      "github": "vyges"
+    }
+  ],
   "interfaces": [
     {
       "type": "bus",
-      "direction": "input",
+      "direction": "slave",
       "protocol": "TL-UL",
+      "port": "tl_i",
       "width": 32,
-      "description": "TL-UL host interface for register access"
+      "description": "TileLink Uncached Lightweight (TL-UL) host-to-device interface for incoming transactions."
     },
     {
       "type": "bus",
+      "direction": "master",
+      "protocol": "TL-UL",
+      "port": "tl_o",
+      "width": 32,
+      "description": "TileLink Uncached Lightweight (TL-UL) device-to-host interface for outgoing responses."
+    },
+    {
+      "type": "clock",
+      "direction": "input",
+      "protocol": "clock",
+      "port": "clk_i",
+      "width": 1,
+      "description": "Clock input signal."
+    },
+    {
+      "type": "reset",
+      "direction": "input",
+      "protocol": "reset",
+      "port": "rst_ni",
+      "width": 1,
+      "description": "Active-low reset signal."
+    },
+    {
+      "type": "data",
       "direction": "output",
-      "protocol": "UART",
-      "description": "UART TX/RX serial interface"
+      "protocol": "custom",
+      "port": "reg2hw",
+      "width": 32,
+      "description": "Data output from the UART register to hardware."
+    },
+    {
+      "type": "data",
+      "direction": "input",
+      "protocol": "custom",
+      "port": "hw2reg",
+      "width": 32,
+      "description": "Data input from hardware to the UART register."
+    },
+    {
+      "type": "interrupt",
+      "direction": "output",
+      "protocol": "custom",
+      "port": "intg_err_o",
+      "width": 1,
+      "description": "Output signal indicating an integrity check error."
     }
   ],
+  "parameters": [
+    {
+      "name": "EnableRacl",
+      "type": "bit",
+      "default": 0,
+      "description": "Enable or disable RACL (Register Access Control Logic)."
+    },
+    {
+      "name": "RaclErrorRsp",
+      "type": "bit",
+      "default": 1,
+      "description": "Enable or disable RACL error response."
+    },
+    {
+      "name": "RxFifoDepth",
+      "type": "int",
+      "default": 64,
+      "description": "Depth of the receive FIFO buffer."
+    },
+    {
+      "name": "TxFifoDepth",
+      "type": "int",
+      "default": 32,
+      "description": "Depth of the transmit FIFO buffer."
+    },
+    {
+      "name": "NumRegs",
+      "type": "int",
+      "default": 13,
+      "description": "Number of registers in the UART module."
+    }
+  ],
+  "performance": {},
+  "architecture": {
+    "type": "peripheral",
+    "features": [
+      "TL-UL protocol support",
+      "Configurable FIFO depths",
+      "Interrupt handling for various UART events",
+      "Error detection for integrity and spurious writes"
+    ]
+  },
+  "asic": {
+    "flavor": "digital",
+    "technology": [
+      "sky130A"
+    ]
+  },
+  "fpga": {
+    "toolchain": [
+      "Vivado"
+    ],
+    "devices": [
+      "Artix-7"
+    ]
+  },
+  "dependencies": [
+    {
+      "name": "tlul_pkg",
+      "type": "library",
+      "description": "TileLink Uncached Lightweight (TL-UL) protocol package."
+    },
+    {
+      "name": "uart_reg_pkg",
+      "type": "library",
+      "description": "UART register package containing data structures and parameters."
+    },
+    {
+      "name": "prim_assert",
+      "type": "library",
+      "description": "Primitive assertion library for design verification."
+    }
+  ],
+  "test": {
+    "testbenches": [],
+    "status": "upstream_passing",
+    "coverage": "functional"
+  },
+  "documentation": {
+    "upstream": "https://opentitan.org/book/"
+  },
+  "artifacts": {
+    "total_rtl_lines": 3190
+  },
   "categories": [
     {
       "main_category": "Interface Controllers",
-      "sub_category": "uart, serial"
+      "sub_category": "Serial Interfaces"
     }
   ],
-  "community": {
-    "issues": "https://github.com/vyges-ip/opentitan-uart/issues",
-    "contributions": "https://github.com/vyges-ip/opentitan-uart/pulls"
-  },
-  "branding": {
-    "provider": "Vyges IP Catalog",
-    "logo": "https://vyges.com/assets/logo.svg",
-    "website": "https://github.com/vyges-ip/opentitan-uart",
-    "usage": "Use of the logo is permitted for attribution or compatibility references only."
-  },
   "keywords": [
-    "uart",
-    "serial",
-    "opentitan",
-    "lowrisc-opentitan"
+    "UART",
+    "TL-UL",
+    "FIFO",
+    "OpenTitan",
+    "Serial Communication"
   ],
-  "asic": {
-    "flavor": "digital",
-    "pdks": [
-      "sky130A"
-    ],
-    "synthesis_tool": "yosys"
+  "trust": {
+    "verification_level": "silicon_proven",
+    "tapeout_count": 0,
+    "fpga_validated": false,
+    "formal_verified": false,
+    "maintained": true,
+    "last_activity": "2026-04-01"
   },
-  "fpga": {
-    "toolchain": "yosys"
-  },
-  "automation": {
-    "automation_level": "basic"
+  "meta": {
+    "template": {
+      "generator": "github-models-ai",
+      "template_version": "1.0.0",
+      "generated_at": "2026-04-01T06:04:51Z"
+    },
+    "schema": {
+      "version": "1.0.0"
+    }
   }
 }

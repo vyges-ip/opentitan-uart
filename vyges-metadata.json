@@ -47,28 +47,39 @@
       "description": "UART TX/RX serial interface"
     }
   ],
-  "categories": {
-    "primary": "communication",
-    "secondary": [
-      "uart",
-      "serial"
-    ],
-    "tags": [
-      "uart",
-      "serial",
-      "opentitan",
-      "lowrisc-opentitan"
-    ]
-  },
+  "categories": [
+    {
+      "main_category": "Interface Controllers",
+      "sub_category": "uart, serial"
+    }
+  ],
   "community": {
     "issues": "https://github.com/vyges-ip/opentitan-uart/issues",
     "contributions": "https://github.com/vyges-ip/opentitan-uart/pulls"
   },
   "branding": {
-    "display_name": "UART",
     "provider": "Vyges IP Catalog",
     "logo": "https://vyges.com/assets/logo.svg",
     "website": "https://github.com/vyges-ip/opentitan-uart",
     "usage": "Use of the logo is permitted for attribution or compatibility references only."
+  },
+  "keywords": [
+    "uart",
+    "serial",
+    "opentitan",
+    "lowrisc-opentitan"
+  ],
+  "asic": {
+    "flavor": "digital",
+    "pdks": [
+      "sky130A"
+    ],
+    "synthesis_tool": "yosys"
+  },
+  "fpga": {
+    "toolchain": "yosys"
+  },
+  "automation": {
+    "automation_level": "basic"
   }
 }

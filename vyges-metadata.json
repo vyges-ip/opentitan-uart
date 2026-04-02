@@ -14,7 +14,7 @@
     "digital"
   ],
   "created": "2026-04-01T06:04:51Z",
-  "updated": "2026-04-01T06:04:51Z",
+  "updated": "2026-04-02T03:11:53Z",
   "source": {
     "type": "git",
     "url": "https://github.com/lowRISC/opentitan",
@@ -174,12 +174,15 @@
   "artifacts": {
     "total_rtl_lines": 3190
   },
-  "categories": [
-    {
-      "main_category": "Interface Controllers",
-      "sub_category": "Serial Interfaces"
-    }
-  ],
+  "categories": {
+    "primary": "Interface Controllers",
+    "secondary": [
+      {
+        "main_category": "Interface Controllers",
+        "sub_category": "Serial Interfaces"
+      }
+    ]
+  },
   "keywords": [
     "UART",
     "TL-UL",
@@ -204,5 +207,26 @@
     "schema": {
       "version": "1.0.0"
     }
-  }
+  },
+  "rtl_files": [
+    "rtl/uart_reg_pkg.sv",
+    "rtl/uart_rx.sv",
+    "rtl/uart_tx.sv",
+    "rtl/uart_core.sv",
+    "rtl/uart_reg_top.sv",
+    "rtl/uart.sv"
+  ],
+  "rtl_quality": {
+    "module_prefixed": true,
+    "defines_prefixed": true,
+    "header_guards": false,
+    "one_module_per_file": true,
+    "self_contained_includes": false,
+    "no_translate_pragmas": true,
+    "lint_clean": false,
+    "no_casex": true,
+    "width_clean": false,
+    "no_sv_keyword_conflicts": true
+  },
+  "defines": []
 }

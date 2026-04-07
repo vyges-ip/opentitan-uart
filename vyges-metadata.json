@@ -243,5 +243,75 @@
     "schema": {
       "version": "1.0.0"
     }
+  },
+  "integration": {
+    "soc_generator_hints": {
+      "top_module": "uart",
+      "clock": {
+        "port": "clk_i"
+      },
+      "reset": {
+        "port": "rst_ni",
+        "polarity": "active_low"
+      },
+      "bus_slave": {
+        "protocol": "TL-UL",
+        "ports": {
+          "tl_i": "tl_i",
+          "tl_o": "tl_o"
+        }
+      },
+      "interrupts": [
+        {
+          "port": "intr_tx_watermark_o",
+          "type": "level"
+        },
+        {
+          "port": "intr_tx_empty_o",
+          "type": "level"
+        },
+        {
+          "port": "intr_rx_watermark_o",
+          "type": "level"
+        },
+        {
+          "port": "intr_tx_done_o",
+          "type": "level"
+        },
+        {
+          "port": "intr_rx_overflow_o",
+          "type": "level"
+        },
+        {
+          "port": "intr_rx_frame_err_o",
+          "type": "level"
+        },
+        {
+          "port": "intr_rx_break_err_o",
+          "type": "level"
+        },
+        {
+          "port": "intr_rx_timeout_o",
+          "type": "level"
+        },
+        {
+          "port": "intr_rx_parity_err_o",
+          "type": "level"
+        }
+      ],
+      "parameters": [],
+      "external_io": [
+        {
+          "port": "cio_rx_i",
+          "direction": "input",
+          "signal": "uart_rx"
+        },
+        {
+          "port": "cio_tx_o",
+          "direction": "output",
+          "signal": "uart_tx"
+        }
+      ]
+    }
   }
 }

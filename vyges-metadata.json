@@ -39,7 +39,8 @@
       "protocol": "TL-UL",
       "port": "tl_i",
       "width": 32,
-      "description": "TL-UL host-to-device interface for incoming transactions."
+      "description": "TL-UL host-to-device interface for incoming transactions.",
+      "protocol_level": "signed"
     },
     {
       "type": "bus",
@@ -47,7 +48,8 @@
       "protocol": "TL-UL",
       "port": "tl_o",
       "width": 32,
-      "description": "TL-UL device-to-host interface for outgoing transactions."
+      "description": "TL-UL device-to-host interface for outgoing transactions.",
+      "protocol_level": "signed"
     },
     {
       "type": "clock",

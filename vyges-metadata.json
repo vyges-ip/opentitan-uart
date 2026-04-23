@@ -225,5 +225,13 @@
     "schema": {
       "version": "1.0.0"
     }
-  }
+  },
+  "vyges_overlays": [
+    {
+      "path": "vyges-overlays/uart_reg_top.sv",
+      "replaces": "rtl/uart_reg_top.sv",
+      "kind": "fixup",
+      "reason": "Upstream uses struct-level XOR reduction on racl_policies_i that Vivado 2025.2 rejects. Overlay replaces the reduction with 1'b0 tie-off for RACL-disabled builds."
+    }
+  ]
 }

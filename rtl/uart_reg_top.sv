@@ -178,7 +178,9 @@ module uart_reg_top
   logic intr_test_rx_parity_err_wd;
   logic intr_test_tx_empty_wd;
   logic alert_test_we;
-  logic alert_test_wd;
+  logic alert_test_fatal_fault_wd;
+  logic alert_test_regwen_qs;
+  logic alert_test_regwen_wd;
   logic ctrl_we;
   logic ctrl_tx_qs;
   logic ctrl_tx_wd;
@@ -243,6 +245,7 @@ module uart_reg_top
   ) u_intr_state_tx_watermark (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (1'b0),
@@ -270,6 +273,7 @@ module uart_reg_top
   ) u_intr_state_rx_watermark (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (1'b0),
@@ -297,6 +301,7 @@ module uart_reg_top
   ) u_intr_state_tx_done (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_state_we),
@@ -324,6 +329,7 @@ module uart_reg_top
   ) u_intr_state_rx_overflow (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_state_we),
@@ -351,6 +357,7 @@ module uart_reg_top
   ) u_intr_state_rx_frame_err (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_state_we),
@@ -378,6 +385,7 @@ module uart_reg_top
   ) u_intr_state_rx_break_err (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_state_we),
@@ -405,6 +413,7 @@ module uart_reg_top
   ) u_intr_state_rx_timeout (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_state_we),
@@ -432,6 +441,7 @@ module uart_reg_top
   ) u_intr_state_rx_parity_err (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_state_we),
@@ -459,6 +469,7 @@ module uart_reg_top
   ) u_intr_state_tx_empty (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (1'b0),
@@ -488,6 +499,7 @@ module uart_reg_top
   ) u_intr_enable_tx_watermark (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -515,6 +527,7 @@ module uart_reg_top
   ) u_intr_enable_rx_watermark (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -542,6 +555,7 @@ module uart_reg_top
   ) u_intr_enable_tx_done (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -569,6 +583,7 @@ module uart_reg_top
   ) u_intr_enable_rx_overflow (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -596,6 +611,7 @@ module uart_reg_top
   ) u_intr_enable_rx_frame_err (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -623,6 +639,7 @@ module uart_reg_top
   ) u_intr_enable_rx_break_err (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -650,6 +667,7 @@ module uart_reg_top
   ) u_intr_enable_rx_timeout (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -677,6 +695,7 @@ module uart_reg_top
   ) u_intr_enable_rx_parity_err (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -704,6 +723,7 @@ module uart_reg_top
   ) u_intr_enable_tx_empty (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (intr_enable_we),
@@ -874,14 +894,18 @@ module uart_reg_top
 
   // R[alert_test]: V(True)
   logic alert_test_qe;
-  logic [0:0] alert_test_flds_we;
+  logic [1:0] alert_test_flds_we;
   assign alert_test_qe = &alert_test_flds_we;
+  // Create REGWEN-gated WE signal
+  logic alert_test_gated_we;
+  assign alert_test_gated_we = alert_test_we && alert_test_regwen_qs;
+  //   F[fatal_fault]: 0:0
   prim_subreg_ext #(
     .DW    (1)
-  ) u_alert_test (
+  ) u_alert_test_fatal_fault (
     .re     (1'b0),
-    .we     (alert_test_we),
-    .wd     (alert_test_wd),
+    .we     (alert_test_gated_we),
+    .wd     (alert_test_fatal_fault_wd),
     .d      ('0),
     .qre    (),
     .qe     (alert_test_flds_we[0]),
@@ -890,6 +914,34 @@ module uart_reg_top
     .qs     ()
   );
   assign reg2hw.alert_test.qe = alert_test_qe;
+
+  //   F[regwen]: 31:31
+  prim_subreg #(
+    .DW      (1),
+    .SwAccess(prim_subreg_pkg::SwAccessW0C),
+    .RESVAL  (1'h1),
+    .Mubi    (1'b0)
+  ) u_alert_test_regwen (
+    .clk_i   (clk_i),
+    .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
+
+    // from register interface
+    .we     (alert_test_we),
+    .wd     (alert_test_regwen_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0),
+
+    // to internal hardware
+    .qe     (alert_test_flds_we[1]),
+    .q      (),
+    .ds     (),
+
+    // to register interface (read)
+    .qs     (alert_test_regwen_qs)
+  );
 
 
   // R[ctrl]: V(False)
@@ -902,6 +954,7 @@ module uart_reg_top
   ) u_ctrl_tx (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -929,6 +982,7 @@ module uart_reg_top
   ) u_ctrl_rx (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -956,6 +1010,7 @@ module uart_reg_top
   ) u_ctrl_nf (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -983,6 +1038,7 @@ module uart_reg_top
   ) u_ctrl_slpbk (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -1010,6 +1066,7 @@ module uart_reg_top
   ) u_ctrl_llpbk (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -1037,6 +1094,7 @@ module uart_reg_top
   ) u_ctrl_parity_en (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -1064,6 +1122,7 @@ module uart_reg_top
   ) u_ctrl_parity_odd (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -1091,6 +1150,7 @@ module uart_reg_top
   ) u_ctrl_rxblvl (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -1118,6 +1178,7 @@ module uart_reg_top
   ) u_ctrl_nco (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ctrl_we),
@@ -1265,6 +1326,7 @@ module uart_reg_top
   ) u_wdata (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (wdata_we),
@@ -1306,6 +1368,7 @@ module uart_reg_top
   ) u_fifo_ctrl_rxrst (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (fifo_ctrl_we),
@@ -1334,6 +1397,7 @@ module uart_reg_top
   ) u_fifo_ctrl_txrst (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (fifo_ctrl_we),
@@ -1362,6 +1426,7 @@ module uart_reg_top
   ) u_fifo_ctrl_rxilvl (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (fifo_ctrl_we),
@@ -1390,6 +1455,7 @@ module uart_reg_top
   ) u_fifo_ctrl_txilvl (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (fifo_ctrl_we),
@@ -1452,6 +1518,7 @@ module uart_reg_top
   ) u_ovrd_txen (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ovrd_we),
@@ -1479,6 +1546,7 @@ module uart_reg_top
   ) u_ovrd_txval (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (ovrd_we),
@@ -1524,6 +1592,7 @@ module uart_reg_top
   ) u_timeout_ctrl_val (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (timeout_ctrl_we),
@@ -1551,6 +1620,7 @@ module uart_reg_top
   ) u_timeout_ctrl_en (
     .clk_i   (clk_i),
     .rst_ni  (rst_ni),
+    .reinit_i(1'b0),
 
     // from register interface
     .we     (timeout_ctrl_we),
@@ -1714,7 +1784,9 @@ module uart_reg_top
   assign intr_test_tx_empty_wd = reg_wdata[8];
   assign alert_test_we = racl_addr_hit_write[3] & reg_we & !reg_error;
 
-  assign alert_test_wd = reg_wdata[0];
+  assign alert_test_fatal_fault_wd = reg_wdata[0];
+
+  assign alert_test_regwen_wd = reg_wdata[31];
   assign ctrl_we = racl_addr_hit_write[4] & reg_we & !reg_error;
 
   assign ctrl_tx_wd = reg_wdata[0];
@@ -1820,6 +1892,7 @@ module uart_reg_top
 
       racl_addr_hit_read[3]: begin
         reg_rdata_next[0] = '0;
+        reg_rdata_next[31] = alert_test_regwen_qs;
       end
 
       racl_addr_hit_read[4]: begin
